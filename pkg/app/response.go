@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/EDDYCJY/go-gin-example/pkg/e"
+	"demo/pkg/e"
 	"net/http"
 )
 
@@ -17,10 +17,13 @@ type Response struct {
 }
 
 // Response setting gin.JSON
-func (g *Gin) Response(errCode int, data interface{}) {
+func (g *Gin) Response(errCode int, data interface{}, msg string) {
+	if msg == ""{
+		msg = e.GetMsg(errCode)
+	}
 	g.C.JSON(http.StatusOK, Response{
 		Code: errCode,
-		Msg:  e.GetMsg(errCode),
+		Msg:  msg,
 		Data: data,
 	})
 	return

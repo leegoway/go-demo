@@ -5,7 +5,7 @@ import (
 	"demo/services"
 	"demo/pkg/e"
 	"demo/pkg/app"
-	"fmt"
+	"github.com/jinzhu/gorm"
 )
 
 func UserRegisterHandler(c *gin.Context) {
@@ -15,16 +15,16 @@ func UserRegisterHandler(c *gin.Context) {
 	)
 	errCode := app.Bind2Form(c, &form)
 	if errCode != e.SUCCESS {
-		appG.Response(errCode, nil)
+		appG.Response(errCode, nil, "")
 		return
 	}
 	userService := new(services.UserService)
-	u, _ := userService.NewUser(form)
-	appG.Response(e.SUCCESS, u)
-}
-
-func UserUpdateHandler(c *gin.Context) {
-
+	u, err := userService.NewUser(form)
+	if err != nil {
+		appG.Response(e.ERROR, nil, err.Error())
+		return
+	}
+	appG.Response(e.SUCCESS, u, "")
 }
 
 func UserQueryHandler(c *gin.Context)  {
@@ -34,14 +34,27 @@ func UserQueryHandler(c *gin.Context)  {
 	)
 	errCode := app.Bind2Form(c, &form)
 	if errCode != e.SUCCESS {
-		appG.Response(errCode, nil)
+		appG.Response(errCode, nil, "")
 		return
 	}
-	fmt.Println(form)
 	uservice := new(services.UserService)
-	userModel, _ := uservice.QueryUser(form)
-	c.JSON(200, gin.H{"code":200, "msg":"", "data": userModel})
+	userModel, err := uservice.QueryUser(form)
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			appG.Response(e.ERROR_USER_NOT_EXIST, nil, "")
+		} else {
+			appG.Response(e.ERROR, nil, err.Error())
+		}
+	} else {
+		appG.Response(e.SUCCESS, userModel, "")
+	}
 }
+
+func UserUpdateHandler(c *gin.Context) {
+
+}
+
+
 
 func UserMultiQueryHandler(c *gin.Context) {
 

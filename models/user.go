@@ -17,12 +17,3 @@ type User struct {
 func (User) TableName() string {
 	return "user"
 }
-
-//func QueryUser(form services.RegisterUserForm) (*User, error) {
-//	var u User
-//	fmt.Println("check db", db)
-//	if err := db.Where(form).First(&u).Error; err != nil {
-//		return nil, err
-//	}
-//	return &u, nil
-//}

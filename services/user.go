@@ -4,6 +4,7 @@ import (
 	"demo/models"
 	"fmt"
 	"demo/pkg/e"
+	"demo/pkg/app"
 )
 
 type UserService struct {
@@ -20,29 +21,23 @@ type RegisterUserForm struct {
 
 func (us UserService) NewUser (form RegisterUserForm) (u *models.User, err error) {
 	//合法性判断
-	if valid := form.ValidData(); valid != e.SUCCESS {
+	if valid := app.Valid(form); valid != e.SUCCESS {
 		return nil, fmt.Errorf("参数错误，%s", e.GetMsg(valid))
 	}
 
 	u = &models.User{}
+	u.Uid = form.Uid
+	u.Username = form.Username
+	u.Idcard = form.Idcard
+	u.Mobile = form.Mobile
 
-	conds := map[string]interface{} {
-		"Uid": form.Uid,
-		"Username": form.Username,
-		"Idcard": form.Idcard,
-		"Mobile": form.Mobile,
-	}
 	//判断是否已存在
-	models.FindOne(conds, u)
+	models.FindOne(u, &u)
 	if u != nil {
 		return u, nil
 	}
 
 	//新建
-	u.Uid = form.Uid
-	u.Username = form.Username
-	u.Idcard = form.Idcard
-	u.Mobile = form.Mobile
 	if err = u.Save(); err != nil {
 		return nil, err
 	}
@@ -59,16 +54,18 @@ type QueryUserForm struct {
 }
 
 func (us UserService)QueryUser(ucond QueryUserForm) (*models.User, error)  {
-	var u models.User
-	conds := map[string]interface{}{
-		"id": ucond.ID,
-		"uid": ucond.Uid,
-		"username": ucond.Username,
-		"idcard": ucond.Idcard,
-		"mobile": ucond.Mobile,
+	if valid := ucond.ValidData(); valid != e.SUCCESS {
+		return nil, fmt.Errorf("参数错误，%s", e.GetMsg(valid))
 	}
-	fmt.Println("service/user.go QueryUser", conds)
-	models.FindOne(conds, &u)
-	fmt.Println("from db", u)
-	return &u, nil
+
+	var u models.User
+	u.ID = ucond.ID
+	u.Uid = ucond.Uid
+	u.Username = ucond.Username
+	u.Idcard = ucond.Idcard
+	u.Mobile = ucond.Mobile
+
+	fmt.Println("service/user.go QueryUser", u)
+	err := models.FindOne(u, &u)
+	return &u, err
 }

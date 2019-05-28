@@ -61,15 +61,17 @@ func (m *Model) Update() {
 /*
 * 查找一个
 */
-func FindOne(conditions map[string]interface{}, out interface{}) {
-	db.Where(conditions).First(out)
+func FindOne(conditions interface{}, out interface{}) error {
+	err := db.Where(conditions).First(out).Error
+	return err
 }
 
 /*
 * 查找符合条件的所有
 */
-func FindAll(conditions map[string]interface{}, out *interface{}) {
-	db.Where(conditions).Find(out)
+func FindAll(conditions map[string]interface{}, out *interface{}) error {
+	err := db.Where(conditions).Find(out).Error
+	return err
 }
 
 /*
