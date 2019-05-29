@@ -1,10 +1,10 @@
-package handlers
+package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"demo/services"
-	"demo/pkg/e"
-	"demo/pkg/app"
+	"github.com/leegoway/go-demo/services"
+	"github.com/leegoway/go-demo/pkg/e"
+	"github.com/leegoway/go-demo/pkg/app"
 	"github.com/jinzhu/gorm"
 )
 

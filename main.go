@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"runtime"
 	"flag"
-	"demo/config"
+	"github.com/leegoway/go-demo/config"
 	"github.com/gin-gonic/gin"
     "github.com/fvbock/endless"
-	"demo/routers"
-	_ "demo/models"
-	)
+	"github.com/leegoway/go-demo/routers"
+	_ "github.com/leegoway/go-demo/model"
+)
 
 var (
 	configFile = flag.String("config", "", "config file path");
@@ -19,29 +19,26 @@ var (
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-
 	flag.Parse()
 
-	var cfg *config.Config
 	var err error
-
 	if len(*configFile) == 0 {
 		fmt.Println("use default config")
-		cfg = config.NewConfigDefault()
+		config.Cfg = config.NewConfigDefault()
 	} else {
-		if cfg, err = config.NewConfigWithFile(*configFile); err != nil {
+		if config.Cfg, err = config.NewConfigWithFile(*configFile); err != nil {
 			fmt.Println(err)
 		}
 	}
 
-	if cfg.AppMode == "product" {
+	if config.Cfg.AppMode == "product" {
 		gin.SetMode(gin.ReleaseMode)
+	} else {
+		gin.SetMode(gin.DebugMode)
 	}
-
-	r := gin.Default()
-
-	routers.InitRouters(r)
-	err = endless.ListenAndServe(cfg.HttpAddr, r)
+	fmt.Print(config.Cfg)
+	r := routers.InitRouters()
+	err = endless.ListenAndServe(config.Cfg.HttpAddr, r)
 	if err != nil {
 		fmt.Println(err)
 	}

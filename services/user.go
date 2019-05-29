@@ -1,10 +1,10 @@
 package services
 
 import (
-	"demo/models"
 	"fmt"
-	"demo/pkg/e"
-	"demo/pkg/app"
+	"github.com/leegoway/go-demo/model"
+	"github.com/leegoway/go-demo/pkg/e"
+	"github.com/leegoway/go-demo/pkg/app"
 )
 
 type UserService struct {
@@ -19,22 +19,22 @@ type RegisterUserForm struct {
 	Mobile        string `form:"mobile" valid:"MaxSize(64)"`
 }
 
-func (us UserService) NewUser (form RegisterUserForm) (u *models.User, err error) {
+func (us UserService) NewUser (form RegisterUserForm) (u *model.User, err error) {
 	//合法性判断
 	if valid := app.Valid(form); valid != e.SUCCESS {
 		return nil, fmt.Errorf("参数错误，%s", e.GetMsg(valid))
 	}
 
-	u = &models.User{}
+	u = &model.User{}
 	u.Uid = form.Uid
 	u.Username = form.Username
 	u.Idcard = form.Idcard
 	u.Mobile = form.Mobile
 
 	//判断是否已存在
-	models.FindOne(u, &u)
+	err = model.FindOne(u, &u)
 	if u != nil {
-		return u, nil
+		return u, err
 	}
 
 	//新建
@@ -53,12 +53,12 @@ type QueryUserForm struct {
 	Mobile        string `form:"mobile" valid:"MaxSize(64)"`
 }
 
-func (us UserService)QueryUser(ucond QueryUserForm) (*models.User, error)  {
+func (us UserService)QueryUser(ucond QueryUserForm) (*model.User, error)  {
 	if valid := ucond.ValidData(); valid != e.SUCCESS {
 		return nil, fmt.Errorf("参数错误，%s", e.GetMsg(valid))
 	}
 
-	var u models.User
+	var u model.User
 	u.ID = ucond.ID
 	u.Uid = ucond.Uid
 	u.Username = ucond.Username
@@ -66,6 +66,6 @@ func (us UserService)QueryUser(ucond QueryUserForm) (*models.User, error)  {
 	u.Mobile = ucond.Mobile
 
 	fmt.Println("service/user.go QueryUser", u)
-	err := models.FindOne(u, &u)
+	err := model.FindOne(u, &u)
 	return &u, err
 }

@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	"demo/pkg/e"
+	"github.com/leegoway/go-demo/pkg/e"
 	"github.com/astaxie/beego/validation"
 	"fmt"
 	)

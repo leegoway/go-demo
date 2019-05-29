@@ -2,7 +2,7 @@ package services
 
 import (
 	"github.com/astaxie/beego/validation"
-	"demo/pkg/e"
+	"github.com/leegoway/go-demo/pkg/e"
 )
 
 type FormValidator struct {
