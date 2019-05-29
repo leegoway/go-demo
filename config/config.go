@@ -36,7 +36,6 @@ type RedisConfig struct {
 }
 
 type DBConfig struct {
-	Type string `toml:"type"`
 	User string `toml:"user"`
 	Password string `toml:"password"`
 	Host string `toml:"host"`

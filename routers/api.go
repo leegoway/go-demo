@@ -14,7 +14,7 @@ func InitRouters() *gin.Engine  {
 	{
 		v1.POST("/user/register", controller.UserRegisterHandler)
 		v1.POST("/user/update", controller.UserUpdateHandler)
-		v1.POST("/user/query", controller.UserQueryHandler)
+		v1.GET("/user/query", controller.UserQueryHandler)
 		v1.POST("/user/multi_query", controller.UserMultiQueryHandler)
 	}
 	return r

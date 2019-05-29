@@ -9,7 +9,7 @@ type FormValidator struct {
 
 }
 
-func (f *FormValidator) ValidData() int {
+func (f *FormValidator) ValidData() uint32 {
 	valid := validation.Validation{}
 	check, err := valid.Valid(f)
 	if err != nil {

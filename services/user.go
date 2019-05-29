@@ -53,9 +53,9 @@ type QueryUserForm struct {
 	Mobile        string `form:"mobile" valid:"MaxSize(64)"`
 }
 
-func (us UserService)QueryUser(ucond QueryUserForm) (*model.User, error)  {
+func (us UserService)QueryUser(ucond QueryUserForm) (*model.User, *e.ErrorCode)  {
 	if valid := ucond.ValidData(); valid != e.SUCCESS {
-		return nil, fmt.Errorf("参数错误，%s", e.GetMsg(valid))
+		return nil, e.Wrap(fmt.Errorf("参数错误，%s", e.GetMsg(valid)))
 	}
 
 	var u model.User
@@ -67,5 +67,8 @@ func (us UserService)QueryUser(ucond QueryUserForm) (*model.User, error)  {
 
 	fmt.Println("service/user.go QueryUser", u)
 	err := model.FindOne(u, &u)
-	return &u, err
+	if err != nil {
+		return nil, e.Wrap(err)
+	}
+	return &u, nil
 }

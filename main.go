@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/leegoway/go-demo/model"
 	"runtime"
 	"flag"
 	"github.com/leegoway/go-demo/config"
 	"github.com/gin-gonic/gin"
     "github.com/fvbock/endless"
 	"github.com/leegoway/go-demo/routers"
-	_ "github.com/leegoway/go-demo/model"
+	//_ "github.com/leegoway/go-demo/model"
 )
 
 var (
@@ -36,10 +37,13 @@ func main() {
 	} else {
 		gin.SetMode(gin.DebugMode)
 	}
-	fmt.Print(config.Cfg)
+	fmt.Println("加载配置：", config.Cfg)
+	model.InitDb()
+
 	r := routers.InitRouters()
 	err = endless.ListenAndServe(config.Cfg.HttpAddr, r)
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("Demo stopped")
 }

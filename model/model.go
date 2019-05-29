@@ -1,26 +1,35 @@
 package model
 
 import (
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/jinzhu/gorm"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/leegoway/go-demo/config"
+	"time"
 )
 
 var db *gorm.DB
 
 //初始化全局链接
-func init() {
+func InitDb() {
 	var err error
-	db, err = gorm.Open("mysql", "root:root123!@#@/ucenter?charset=utf8&parseTime=True")
+	// "root:root123!@#@/ucenter?charset=utf8&parseTime=True"
+	dbConfig := config.Cfg.Database
+	db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True",
+		dbConfig.User,
+		dbConfig.Password,
+		dbConfig.Host,
+		dbConfig.DbName))
 	if err != nil {
 		fmt.Println("connect db error: ", err)
 	}
 	db.LogMode(true)
 	fmt.Println("connected to db")
 	db.SingularTable(true)
-	db.DB().SetMaxIdleConns(10)
-	db.DB().SetMaxOpenConns(100)
+	db.DB().SetMaxIdleConns(100) // 最大空闲连接数
+	db.DB().SetMaxOpenConns(200) // 最大打开连接数
+	db.DB().SetConnMaxLifetime(28000*time.Second) //否则会出现一次ErrInvalidConn
 }
 
 //通用Model结构体方法

@@ -2,10 +2,10 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/leegoway/go-demo/services"
-	"github.com/leegoway/go-demo/pkg/e"
-	"github.com/leegoway/go-demo/pkg/app"
 	"github.com/jinzhu/gorm"
+	"github.com/leegoway/go-demo/pkg/app"
+	"github.com/leegoway/go-demo/pkg/e"
+	"github.com/leegoway/go-demo/services"
 )
 
 func UserRegisterHandler(c *gin.Context) {
@@ -13,15 +13,15 @@ func UserRegisterHandler(c *gin.Context) {
 		appG = app.Gin{C: c}
 		form services.RegisterUserForm
 	)
-	errCode := app.Bind2Form(c, &form)
-	if errCode != e.SUCCESS {
-		appG.Response(errCode, nil, "")
+	err := appG.Bind2Form(c, &form)
+	if err != nil {
+		appG.Response(err.Code(), nil, err.Msg())
 		return
 	}
 	userService := new(services.UserService)
-	u, err := userService.NewUser(form)
-	if err != nil {
-		appG.Response(e.ERROR, nil, err.Error())
+	u, err1 := userService.NewUser(form)
+	if err1 != nil {
+		appG.Response(e.ERROR, nil, err1.Error())
 		return
 	}
 	appG.Response(e.SUCCESS, u, "")
@@ -32,9 +32,9 @@ func UserQueryHandler(c *gin.Context)  {
 		appG = app.Gin{C: c}
 		form services.QueryUserForm
 	)
-	errCode := app.Bind2Form(c, &form)
-	if errCode != e.SUCCESS {
-		appG.Response(errCode, nil, "")
+	err := appG.Bind2Form(c, &form)
+	if err != nil {
+		appG.Response(err.Code(), nil, err.Msg())
 		return
 	}
 	uservice := new(services.UserService)
