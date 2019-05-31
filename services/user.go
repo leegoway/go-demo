@@ -13,33 +13,37 @@ type UserService struct {
 
 type RegisterUserForm struct {
 	FormValidator
-	Uid           int64  `form:"uid" valid:"Required;Min(1)"`
+	Uid           int64  `form:"uid" json:"user" valid:"Required;Min(1)"`
 	Username      string `form:"username" valid:"MaxSize(32)"`
 	Idcard        string `form:"idcard" valid:"MaxSize(64)"`
 	Mobile        string `form:"mobile" valid:"MaxSize(64)"`
 }
 
-func (us UserService) NewUser (form RegisterUserForm) (u *model.User, err error) {
+func (us UserService) NewUser (form RegisterUserForm) (*model.User, *e.ErrorCode) {
 	//合法性判断
-	if valid := app.Valid(form); valid != e.SUCCESS {
-		return nil, fmt.Errorf("参数错误，%s", e.GetMsg(valid))
+	if err := app.Valid(form); err != nil {
+		return nil, err
 	}
 
-	u = &model.User{}
-	u.Uid = form.Uid
-	u.Username = form.Username
-	u.Idcard = form.Idcard
-	u.Mobile = form.Mobile
-
+	params := map[string]interface{} {
+		"uid": form.Uid,
+		"username": form.Username,
+		"idcard": form.Idcard,
+		"mobile": form.Mobile,
+	}
+	u := &model.User{}
 	//判断是否已存在
-	err = model.FindOne(u, &u)
-	if u != nil {
-		return u, err
+	err := model.FindOne(params, &u)
+	if err != nil {
+		return u, e.Wrap(err)
+	}
+	if u.Uid != 0 {
+		return u, nil
 	}
 
 	//新建
-	if err = u.Save(); err != nil {
-		return nil, err
+	if err = model.Save(params); err != nil {
+		return nil, e.Wrap(err)
 	}
 	return u, nil
 }

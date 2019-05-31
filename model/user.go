@@ -17,3 +17,17 @@ type User struct {
 func (User) TableName() string {
 	return "user"
 }
+
+func (u *User) Save () error {
+	if err := db.Create(u).Error; err != nil {
+		return err
+	}
+	var i int32
+	err := db.Exec("SELECT LAST_INSERT_ID()", i).Error
+	if err != nil {
+		return err
+	}
+	u.ID = i
+	return nil
+}
+

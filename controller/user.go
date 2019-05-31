@@ -2,9 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/leegoway/go-demo/pkg/app"
-	"github.com/leegoway/go-demo/pkg/e"
 	"github.com/leegoway/go-demo/services"
 )
 
@@ -15,16 +13,16 @@ func UserRegisterHandler(c *gin.Context) {
 	)
 	err := appG.Bind2Form(c, &form)
 	if err != nil {
-		appG.Response(err.Code(), nil, err.Msg())
+		appG.Response(nil, err)
 		return
 	}
 	userService := new(services.UserService)
-	u, err1 := userService.NewUser(form)
-	if err1 != nil {
-		appG.Response(e.ERROR, nil, err1.Error())
+	u, err := userService.NewUser(form)
+	if err != nil {
+		appG.Response(u, err)
 		return
 	}
-	appG.Response(e.SUCCESS, u, "")
+	appG.Response(u, nil)
 }
 
 func UserQueryHandler(c *gin.Context)  {
@@ -34,19 +32,15 @@ func UserQueryHandler(c *gin.Context)  {
 	)
 	err := appG.Bind2Form(c, &form)
 	if err != nil {
-		appG.Response(err.Code(), nil, err.Msg())
+		appG.Response(nil, err)
 		return
 	}
 	uservice := new(services.UserService)
 	userModel, err := uservice.QueryUser(form)
 	if err != nil {
-		if gorm.IsRecordNotFoundError(err) {
-			appG.Response(e.ERROR_USER_NOT_EXIST, nil, "")
-		} else {
-			appG.Response(e.ERROR, nil, err.Error())
-		}
+		appG.Response(nil, err)
 	} else {
-		appG.Response(e.SUCCESS, userModel, "")
+		appG.Response(userModel, nil)
 	}
 }
 

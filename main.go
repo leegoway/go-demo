@@ -21,6 +21,7 @@ var (
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	flag.Parse()
+	fmt.Println(fmt.Sprintf("%s [version=%s] starting...", APPNAME, APPVERSION))
 
 	var err error
 	if len(*configFile) == 0 {
@@ -37,13 +38,16 @@ func main() {
 	} else {
 		gin.SetMode(gin.DebugMode)
 	}
-	fmt.Println("加载配置：", config.Cfg)
-	model.InitDb()
+	fmt.Println("已加载配置")
+	if err = model.InitDB(); err != nil {
+		fmt.Println("初始化DB链接失败", err)
+	}
+	defer model.CloseDB()
 
 	r := routers.InitRouters()
 	err = endless.ListenAndServe(config.Cfg.HttpAddr, r)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("Demo stopped")
+	fmt.Println(fmt.Sprintf("%s stopped", APPNAME))
 }

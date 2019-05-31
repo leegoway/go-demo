@@ -12,9 +12,8 @@ import (
 var db *gorm.DB
 
 //初始化全局链接
-func InitDb() {
+func InitDB() error {
 	var err error
-	// "root:root123!@#@/ucenter?charset=utf8&parseTime=True"
 	dbConfig := config.Cfg.Database
 	db, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True",
 		dbConfig.User,
@@ -22,14 +21,19 @@ func InitDb() {
 		dbConfig.Host,
 		dbConfig.DbName))
 	if err != nil {
-		fmt.Println("connect db error: ", err)
+		return err
 	}
 	db.LogMode(true)
-	fmt.Println("connected to db")
+	fmt.Println("已经连接数据库DB")
 	db.SingularTable(true)
 	db.DB().SetMaxIdleConns(100) // 最大空闲连接数
 	db.DB().SetMaxOpenConns(200) // 最大打开连接数
 	db.DB().SetConnMaxLifetime(28000*time.Second) //否则会出现一次ErrInvalidConn
+	return nil
+}
+
+func CloseDB() error {
+	return db.Close()
 }
 
 //通用Model结构体方法
@@ -65,6 +69,20 @@ func (m *Model) Delete () {
 */
 func (m *Model) Update() {
 
+}
+
+func Save(m interface{}) error {
+	err := db.Create(m).Error
+	if err != nil {
+		return err
+	}
+	//var i int32
+	//err = db.Exec("SELECT LAST_INSERT_ID()", i).Error
+	//if err != nil {
+	//	return err
+	//}
+	//m.ID = i
+	return nil
 }
 
 /*
